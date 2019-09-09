@@ -81,7 +81,7 @@ class NetworkLoader(object):
         print(centralities_using_in_degree[1], centralities_using_out_degree[70000])
 
         closeness_centralities = closeness_centrality(self.graph)
-        centralities_using_closeness = sorted(closeness_centrality.items(), key=operator.itemgetter(1))
+        centralities_using_closeness = sorted(closeness_centralities.items(), key=operator.itemgetter(1))
 
         betweenness_centralities = betweenness_centrality(self.graph)
         centralities_using_betweenness = sorted(betweenness_centralities.items(), key=operator.itemgetter(1))
