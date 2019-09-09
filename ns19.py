@@ -1,9 +1,11 @@
 import networkx as nx
 import csv
 import numpy as np
-import seaborn as sns
+# import seaborn as sns
 import operator     
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
+
 from networkx.algorithms.centrality.degree_alg import degree_centrality
 from networkx.algorithms.centrality.degree_alg import out_degree_centrality
 from networkx.algorithms.centrality.degree_alg import in_degree_centrality
