@@ -71,17 +71,19 @@ class NetworkLoader(object):
         
     def find_network_centralities(self):
         centralities = degree_centrality(self.graph)
-        in_degree_centralities = in_degree_centrality(self.graph)
-        out_degree_centralities = out_degree_centrality(self.graph)
-        closeness_centralities = closeness_centrality(self.graph)
-        betweenness_centralities = betweenness_centrality(self.graph)
-
         centralities_using_degree = sorted(centralities.items(), key=operator.itemgetter(1))
+
+        in_degree_centralities = in_degree_centrality(self.graph)
         centralities_using_in_degree = sorted(in_degree_centralities.items(), key=operator.itemgetter(1))
+
+        out_degree_centralities = out_degree_centrality(self.graph)
         centralities_using_out_degree = sorted(out_degree_centralities.items(), key=operator.itemgetter(1))
         print(centralities_using_in_degree[1], centralities_using_out_degree[70000])
 
+        closeness_centralities = closeness_centrality(self.graph)
         centralities_using_closeness = sorted(closeness_centrality.items(), key=operator.itemgetter(1))
+
+        betweenness_centralities = betweenness_centrality(self.graph)
         centralities_using_betweenness = sorted(betweenness_centralities.items(), key=operator.itemgetter(1))
         print(centralities_using_closeness[0], centralities_using_betweenness[0])
 
