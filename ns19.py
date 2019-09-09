@@ -80,16 +80,30 @@ class NetworkLoader(object):
         centralities_using_out_degree = sorted(out_degree_centralities.items(), key=operator.itemgetter(1))
         print(centralities_using_in_degree[1], centralities_using_out_degree[70000])
 
-        closeness_centralities = closeness_centrality(self.graph)
-        centralities_using_closeness = sorted(closeness_centralities.items(), key=operator.itemgetter(1))
+        plt.plot(
+            [each_centrality[0] for each_centrality in centralities_using_degree], 
+            [each_centrality[1] for each_centrality in centralities_using_degree],
+            'ro'
+        )
 
-        betweenness_centralities = betweenness_centrality(self.graph)
-        centralities_using_betweenness = sorted(betweenness_centralities.items(), key=operator.itemgetter(1))
-        print(centralities_using_closeness[0], centralities_using_betweenness[0])
+        # Add labels
+        plt.title('Degree Centrality Plot')
+        plt.xlabel('Node')
+        plt.ylabel('Centrality')
 
-        eigen_centrality = nx.eigenvector_centrality(self.graph, max_iter=10)
-        eigen_centrality = sorted(eigen_centrality.items(), key=operator.itemgetter(1))
-        print(eigen_centrality[0], centralities_using_degree[0])
+        # plt.show()
+        plt.savefig('degree_centrality.png')
+
+        # closeness_centralities = closeness_centrality(self.graph)
+        # centralities_using_closeness = sorted(closeness_centralities.items(), key=operator.itemgetter(1))
+
+        # betweenness_centralities = betweenness_centrality(self.graph)
+        # centralities_using_betweenness = sorted(betweenness_centralities.items(), key=operator.itemgetter(1))
+        # print(centralities_using_closeness[0], centralities_using_betweenness[0])
+
+        # eigen_centrality = nx.eigenvector_centrality(self.graph, max_iter=10)
+        # eigen_centrality = sorted(eigen_centrality.items(), key=operator.itemgetter(1))
+        # print(eigen_centrality[0], centralities_using_degree[0])
 
     def find_degrees_of_graph(self):
         indegrees = [each_degree[1] for each_degree in self.graph.in_degree]
