@@ -80,7 +80,7 @@ class NetworkLoader(object):
         print("Network centrality of the graph is: ", self.find_network_centralities())
     
     def compute_eigen_values(self):
-        L = nx.directed_laplacian_matrix(self.graph)
+        L = nx.normalized_laplacian_matrix(self.graph)
         e = np.linalg.eigvals(L.A)
         print("Largest eigenvalue:", max(e))
         print("Smallest eigenvalue:", min(e))
@@ -329,8 +329,7 @@ class NetworkLoader(object):
 network_loader = NetworkLoader()
 network_loader.load_network_from_scipy_matrix()
 network_loader.export_networkxgraph_to_a_gephi_file()
-
-# network_loader.compute_eigen_values()
+network_loader.compute_eigen_values()
 # network_loader.crawl_network_to_generate_recommendation()
 
 '''
