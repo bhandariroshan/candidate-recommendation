@@ -12,6 +12,10 @@ from networkx.algorithms.centrality.degree_alg import out_degree_centrality
 from networkx.algorithms.centrality.degree_alg import in_degree_centrality
 from networkx.algorithms.centrality import betweenness_centrality
 from networkx.algorithms.centrality import betweenness_centrality, closeness_centrality
+import scipy
+from scipy.io import mmread
+from networkx.convert_matrix import from_scipy_sparse_matrix
+
 
 class FileReader(object):
     def __init__(self, filename):
@@ -51,6 +55,10 @@ class NetworkLoader(object):
         self.graph.add_edges_from(edges.edges())
         self.graph.add_nodes_from(nodes)
 
+    def load_network_from_scipy_matrix(self):
+        scipy_matrix = mmread('bcsstk18.mtx')
+        self.graph = from_scipy_sparse_matrix(scipy_matrix)
+
     def plot_a_subgraph(self):
         print('Drawing graph..')
         subgraph_nodes = [str(i) for i in range(0, 100)]
@@ -85,34 +93,9 @@ class NetworkLoader(object):
         in_degree_centralities = in_degree_centrality(self.graph.subgraph(subgraph_nodes))
         centralities_using_in_degree = sorted(in_degree_centralities.items(), key=operator.itemgetter(1))
 
-        out_degree_centralities = out_degree_centrality(self.graph)
+        out_degree_centralities = out_degree_centrality(self.graph.subgraph(subgraph_nodes))
         centralities_using_out_degree = sorted(out_degree_centralities.items(), key=operator.itemgetter(1))
         print(centralities_using_in_degree[1], centralities_using_out_degree[70000])
-
-        plt.plot(
-            [each_centrality[0] for each_centrality in centralities_using_degree], 
-            [each_centrality[1] for each_centrality in centralities_using_degree],
-            'ro'
-        )
-
-        # Add labels
-        plt.title('Degree Centrality Plot')
-        plt.xlabel('Node')
-        plt.ylabel('Centrality')
-
-        # plt.show()
-        plt.savefig('degree_centrality.png')
-
-        # closeness_centralities = closeness_centrality(self.graph)
-        # centralities_using_closeness = sorted(closeness_centralities.items(), key=operator.itemgetter(1))
-
-        # betweenness_centralities = betweenness_centrality(self.graph)
-        # centralities_using_betweenness = sorted(betweenness_centralities.items(), key=operator.itemgetter(1))
-        # print(centralities_using_closeness[0], centralities_using_betweenness[0])
-
-        # eigen_centrality = nx.eigenvector_centrality(self.graph, max_iter=10)
-        # eigen_centrality = sorted(eigen_centrality.items(), key=operator.itemgetter(1))
-        # print(eigen_centrality[0], centralities_using_degree[0])
 
     def find_degrees_of_graph(self):
         indegrees = [each_degree[1] for each_degree in self.graph.in_degree]
@@ -341,8 +324,9 @@ class NetworkLoader(object):
         plt.savefig('time.png')
 
 network_loader = NetworkLoader()
-# print(network_loader.get_neighbors('1'))
-network_loader.compute_eigen_values()
+network_loader.load_network_from_scipy_matrix()
+
+# network_loader.compute_eigen_values()
 # network_loader.crawl_network_to_generate_recommendation()
 
 '''
