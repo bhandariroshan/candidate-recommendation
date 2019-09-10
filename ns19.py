@@ -75,8 +75,7 @@ class NetworkLoader(object):
         print("Smallest eigenvalue:", min(e))
         plt.hist(e, bins=100)  # histogram with 100 bins
         plt.xlim(0, 2)  # eigenvalues between 0 and 2
-        plt.show()
-
+        plt.savefig("eigen.png", format="PNG")
 
     def find_network_centralities(self):
         subgraph_nodes = [str(i) for i in range(0, 10000)]
