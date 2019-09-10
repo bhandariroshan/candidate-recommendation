@@ -67,12 +67,23 @@ class NetworkLoader(object):
         # print("Center of Network: ", nx.center(self.graph))
         # print("Eccentricity of Network: ", nx.eccentricity(self.graph))
         print("Network centrality of the graph is: ", self.find_network_centralities())
-        
+    
+    def compute_eigen_values(self):
+        L = nx.directed_laplacian_matrix(self.graph)
+        e = np.linalg.eigvals(L.A)
+        print("Largest eigenvalue:", max(e))
+        print("Smallest eigenvalue:", min(e))
+        plt.hist(e, bins=100)  # histogram with 100 bins
+        plt.xlim(0, 2)  # eigenvalues between 0 and 2
+        plt.show()
+
+
     def find_network_centralities(self):
-        centralities = degree_centrality(self.graph)
+        subgraph_nodes = [str(i) for i in range(0, 10000)]
+        centralities = degree_centrality(self.graph.subgraph(subgraph_nodes))
         centralities_using_degree = sorted(centralities.items(), key=operator.itemgetter(1))
 
-        in_degree_centralities = in_degree_centrality(self.graph)
+        in_degree_centralities = in_degree_centrality(self.graph.subgraph(subgraph_nodes))
         centralities_using_in_degree = sorted(in_degree_centralities.items(), key=operator.itemgetter(1))
 
         out_degree_centralities = out_degree_centrality(self.graph)
@@ -332,7 +343,7 @@ class NetworkLoader(object):
 
 network_loader = NetworkLoader()
 # print(network_loader.get_neighbors('1'))
-network_loader.plot_a_subgraph()
+network_loader.compute_eigen_values()
 # network_loader.crawl_network_to_generate_recommendation()
 
 '''
