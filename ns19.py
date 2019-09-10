@@ -5,7 +5,8 @@ import numpy as np
 import operator     
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
-
+import time
+import random
 from networkx.algorithms.centrality.degree_alg import degree_centrality
 from networkx.algorithms.centrality.degree_alg import out_degree_centrality
 from networkx.algorithms.centrality.degree_alg import in_degree_centrality
@@ -36,8 +37,6 @@ class NetworkLoader(object):
         self.graph = nx.DiGraph()
         # self.create_node_file()
         self.load_network()
-        # self.plot_a_subgraph()
-        self.summarize_graph()
 
     def create_node_file(self):
         with open("nodes.txt", 'w') as file:
@@ -54,9 +53,9 @@ class NetworkLoader(object):
 
     def plot_a_subgraph(self):
         print('Drawing graph..')
-        nx.draw(self.graph, node_size=1500, node_color='blue', font_size=8, font_weight='bold')
+        subgraph_nodes = [str(i) for i in range(0, 100)]
+        nx.draw(self.graph.subgraph(subgraph_nodes), node_color='blue', font_size=8, font_weight='bold')
 
-        plt.tight_layout()
         print('Saving graph..')
         plt.savefig("graph.png", format="PNG")
 
@@ -146,6 +145,17 @@ class NetworkLoader(object):
         # plt.show()
         plt.savefig('out_degree_distribution.png')
 
+    def get_neighbors(self, node_name):
+        '''This function gives connected nodes of a node'''
+        neighbors = self.graph.neighbors(str(node_name))
+
+        return_values = []
+        for each_node in neighbors:
+            return_values.append((each_node, self.graph.degree(each_node)))
+
+        return_values = sorted(return_values, key=lambda x: x[1])
+        return return_values
+
     def find_average_min_and_max_degree_of_graph(self):
         degree_sum = 0
         max_degree = None
@@ -179,22 +189,21 @@ class NetworkLoader(object):
         return max_degree, min_degree, average_degree
 
     def implement_algorithm(
-        startNode=None,
-        algorithm="BFS",
-        crawlsize=3500,
-        sample_files=[],
-        network_crawl_writer=None
+            self,
+            startNode=None,
+            algorithm="BFS",
+            crawlsize=3500,
+            network_crawl_writer=None
         ):                   
 
         '''This function implements an algorithm for crawling.'''
-        # print(startNode, algorithm, crawlsize)
 
         visited = []
-        word_list = []
         nodes_processed = 0
-        total_word_count = 0
+        
+        start = time.time()
 
-        Q = get_neighbors(startNode)
+        Q = self.get_neighbors(startNode)
         while (Q):
             nodes_processed += 1
             if nodes_processed > crawlsize:
@@ -218,30 +227,117 @@ class NetworkLoader(object):
             visited.append(u)
 
             # collect all neighbor nodes
-            v = get_neighbors(u)
+            v = self.get_neighbors(u[0])
 
             for each_v in v:
                 if each_v not in Q and each_v not in visited:
                     Q.append(each_v)
 
+        end = time.time()
+
+        suggested_products = sorted(visited, key=lambda x: x[1], reverse=True)[0:10]
+
+        if len(visited) >= 10:
+            suggested_final_products = ''
+            for each_suggested_product in suggested_products:
+                suggested_final_products += str(each_suggested_product[0]) + '|'
+
+            suggested_products = suggested_products[:-1]
+
             network_crawl_writer.writerow(
                 [
                     startNode,
                     algorithm,
-                    crawlsize,
-                    u
+                    suggested_final_products,
+                    end - start
                 ]
             )
 
+    def crawl_network_to_generate_recommendation(self):
+        """
+            This Function iterates for:
+                a. Different fixed Nodes 
+                b. For 3 algorithms
+                c. Stops when it has crawled fixed size or has reached leaf
+                c. Finds recommdation 
+        """
+        algorithms = ["BFS", "DFS", "RFS"]
+        
+        # get start points for algorithmic traversal 
+        start_nodes = [i for i in range(1, 50000, 200)]
 
+        # Stop crawling when processed
+        stop_crawl_when_processed = 1000
+
+        fname = 'traversal' + '.csv'
+        with open(fname, 'w') as csvfile:
+            fieldnames = [
+                'Start Node',
+                "Algorithm" ,
+                "Suggested Products",
+                "Time to Suggest"
+            ]
+
+            tree_crawl_writer = csv.writer(
+                csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+            tree_crawl_writer.writerow(fieldnames)
+
+            for each_start_node in start_nodes:
+                # crawl all the start points for all algorithm
+                # run algorithm to find highest connecting nodes for recommendation
+                for each_algorith in algorithms:
+                    self.implement_algorithm(
+                        each_start_node,
+                        each_algorith,
+                        stop_crawl_when_processed,
+                        tree_crawl_writer
+                    )
+
+                    print("crawling from start point:: " + 
+                        str(each_start_node), ", Algorithm::" + str(each_algorith))
+
+        bfs_avg, bfs_count = 0, 0
+        dfs_avg, dfs_count = 0, 0
+        rfs_avg, rfs_count = 0, 0
+        with open('traversal.csv','r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row and row[1] == 'BFS':
+                    bfs_avg += float(row[3])
+                    bfs_count += 1
+
+                if row and row[1] == 'DFS':
+                    dfs_avg += float(row[3])
+                    dfs_count += 1
+
+                if row and row[1] == 'RFS':
+                    rfs_avg += float(row[3])
+                    rfs_count += 1
+
+        bfs_avg = bfs_avg / bfs_count
+        dfs_avg = dfs_avg / dfs_count
+        rfs_avg = rfs_avg / rfs_count
+
+        y_pos = np.arange(len(algorithms))
+        degrees = [bfs_avg, dfs_avg, rfs_avg]
+
+        plt.bar(y_pos, degrees, align='center', alpha=0.5)
+        plt.xticks(y_pos, algorithms)
+        plt.ylabel('Average Time')
+        plt.title('Average Time required to make 10 product suggestion')
+
+        # plt.show()
+        plt.savefig('time.png')
 
 network_loader = NetworkLoader()
-
+# print(network_loader.get_neighbors('1'))
+network_loader.plot_a_subgraph()
+# network_loader.crawl_network_to_generate_recommendation()
 
 '''
     1. Plot Indegree vS OutDegree
     2. Plot Network Centrality (Closeness Vs Betweeness, degree Vs Eigen)
-    3. Plot Graph
     4. Plot Cluster
     5. Implement BFS, DFS, RFS to crwal and travel network and compare efficiency
 
