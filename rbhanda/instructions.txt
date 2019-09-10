@@ -1,3 +1,9 @@
+Note
+---------------------
+edges.txt is the real world graph downloaded from snap https://snap.stanford.edu/data/amazon0302.html . 
+This file corresponds to amazon's copurchase data based on 'people who bought this also bought this' feature.
+
+
 Instructions
 ---------------------
 1. Extract the gzip file 
