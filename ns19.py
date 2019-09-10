@@ -59,6 +59,9 @@ class NetworkLoader(object):
         scipy_matrix = mmread('bcsstk18.mtx')
         self.graph = from_scipy_sparse_matrix(scipy_matrix)
 
+    def export_networkxgraph_to_a_gephi_file(self):
+         nx.write_gexf(self.graph, "test.gexf")
+
     def plot_a_subgraph(self):
         print('Drawing graph..')
         subgraph_nodes = [str(i) for i in range(0, 100)]
@@ -325,6 +328,7 @@ class NetworkLoader(object):
 
 network_loader = NetworkLoader()
 network_loader.load_network_from_scipy_matrix()
+network_loader.export_networkxgraph_to_a_gephi_file()
 
 # network_loader.compute_eigen_values()
 # network_loader.crawl_network_to_generate_recommendation()
