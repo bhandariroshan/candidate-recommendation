@@ -65,12 +65,8 @@ class NetworkManipulator(object):
             network.append(data)
 
         auth_network = sorted(network,  key=lambda k: k['auth'], reverse=True)[0:10]
-        hubs_network = sorted(network,  key=lambda k: k['hub'], reverse=True)[0:10]
 
         for each_node in auth_network:
-            print(each_node['node'], each_node['auth'], each_node['hub'])
-
-        for each_node in hubs_network:
             print(each_node['node'], each_node['auth'], each_node['hub'])
 
     def find_hubs_and_authorities(self):
@@ -87,8 +83,8 @@ class NetworkManipulator(object):
                 data['hub'] = 0
                 
                 neighbors = self.graph.out_edges(node, data=True)
-                for out_node, self_node, out_edge_data in neighbors:
-                    data['hub'] += self.graph.nodes[in_node]['auth']
+                for self_node, out_node, out_edge_data in neighbors:
+                    data['hub'] += self.graph.nodes[out_node]['auth']
 
         print("Completed updating hubs and auth for {} steps. ".format(self.steps))
         self.print_network_with_hubs_and_authorities()
@@ -100,7 +96,7 @@ if __name__ == "__main__":
 
     nm = NetworkManipulator(
         # matrix_file_name='delaunay_n14.mtx', 
-        edge_file_name='twitter_combined.txt',
+        edge_file_name=matrix_file_name,
         steps=steps
     )
     nm.find_hubs_and_authorities()
