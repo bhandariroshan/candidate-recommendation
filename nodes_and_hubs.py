@@ -3,6 +3,8 @@ import scipy
 import math
 from scipy.io import mmread
 import networkx as nx
+import numpy as np
+from scipy import sparse
 from networkx.convert_matrix import from_scipy_sparse_matrix
 
 
@@ -34,8 +36,12 @@ class NetworkManipulator(object):
             self.graph = nx.read_edgelist(fh, create_using=nx.DiGraph())
 
     def load_network_from_scipy_matrix(self):
+        print(self.matrix_file_name)
         scipy_matrix = mmread(self.matrix_file_name)
-        self.graph = from_scipy_sparse_matrix(scipy_matrix, create_using=nx.DiGraph())
+        b = scipy_matrix.todense()
+        c = np.matrix(b)
+        d = sparse.csr_matrix(c)
+        self.graph = nx.DiGraph(c)
 
     def assign_authorities_and_hubs(self):
         for node, data in self.graph.nodes(data=True):
@@ -112,7 +118,7 @@ if __name__ == "__main__":
         steps = sys.argv[2]
     except:
         steps = 2
-    
+
     try:
         normalize = int(sys.argv[3])
     except:
