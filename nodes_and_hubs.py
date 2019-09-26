@@ -4,6 +4,8 @@ import math
 from scipy.io import mmread
 import networkx as nx
 from networkx.convert_matrix import from_scipy_sparse_matrix
+import multiprocessing
+from multiprocessing import Pool
 
 
 class NetworkManipulator(object):
@@ -35,11 +37,6 @@ class NetworkManipulator(object):
         scipy_matrix = mmread(self.matrix_file_name)
         self.graph = from_scipy_sparse_matrix(scipy_matrix, create_using=nx.DiGraph())
 
-    def assign_authorities_and_hubs(self):
-        for node, data in self.graph.nodes(data=True):
-            data['auth'] = 1
-            data['hub'] = 1
-
     def print_network_with_hubs_and_authorities(self):
         network = []
         for each_node, data in self.graph.nodes(data=True):
@@ -51,35 +48,66 @@ class NetworkManipulator(object):
         for each_node in auth_network:
             print(each_node['node'], each_node['auth'], each_node['hub'])
 
-    def find_hubs_and_authorities(self):
-        self.assign_authorities_and_hubs()
-        for i in range(int(self.steps)):
-            norm = 0 
-            for node, data in self.graph.nodes(data=True):
-                data['auth'] = 0
-                
-                neighbors = self.graph.in_edges(node, data=True)
-                for in_node, self_node, in_edge_data in neighbors:
-                    data['auth'] += self.graph.nodes[in_node]['hub']
+    def do_parallel_in_nodes_processing(self, node, data, norm):
+        data['auth'] = 0
+        neighbors = self.graph.in_edges(node, data=True)
+        for in_node, self_node, in_edge_data in neighbors:
+            data['auth'] += self.graph.nodes[in_node]['hub']
 
-                if self.normalize:
-                    norm += math.pow(data['auth'], 2) # calculate the sum of the squared auth values to normalise
+        if self.normalize:
+            norm += math.pow(data['auth'], 2) # calculate the sum of the squared auth values to normalise
+        
+        return norm
+
+    def do_parallel_in_hub_processing(self, node, data, norm):
+        data['hub'] = 0
+        neighbors = self.graph.in_edges(node, data=True)
+        for in_node, self_node, in_edge_data in neighbors:
+            data['hub'] += self.graph.nodes[in_node]['auth']
+
+        if self.normalize:
+            norm += math.pow(data['hub'], 2) # calculate the sum of the squared auth values to normalise
+        
+        return norm
+
+    def find_hubs_and_authorities(self):
+        cpu_count = multiprocessing.cpu_count()
+
+        for node, data in self.graph.nodes(data=True):
+            data['auth'] = 1
+            data['hub'] = 1
+
+        for i in range(int(self.steps)):
+            global norm 
+            norm = 0
+
+            def add_norm(add_val):
+                global norm
+                norm += add_val
+
+            pool = Pool(cpu_count)
+            results = [
+            pool.apply_async(
+                self.do_parallel_in_nodes_processing, (node, data, norm), callback = add_norm
+                ) for node, data in self.graph.nodes(data=True)
+            ]
             
+            [res.get() for res in results]
+
             if self.normalize:
                 norm = math.sqrt(norm)
                 for node, data in self.graph.nodes(data=True):
                     data['auth'] = round(data['auth'] / norm, 3)
             
             norm = 0
-            for node, data in self.graph.nodes(data=True):
-                data['hub'] = 0
-                
-                neighbors = self.graph.out_edges(node, data=True)
-                for self_node, out_node, out_edge_data in neighbors:
-                    data['hub'] += self.graph.nodes[out_node]['auth']
-                
-                if self.normalize:
-                    norm += math.pow(data['hub'], 2) # calculate the sum of the squared auth values to normalise
+            pool = Pool(cpu_count)
+            results = [
+            pool.apply_async(
+                self.do_parallel_in_hub_processing, (node, data, norm), callback = add_norm
+                ) for node, data in self.graph.nodes(data=True)
+            ]
+            
+            [res.get() for res in results]
 
             if self.normalize:
                 norm = math.sqrt(norm)
