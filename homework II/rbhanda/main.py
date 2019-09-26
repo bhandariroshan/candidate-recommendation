@@ -29,6 +29,7 @@ class NetworkManipulator(object):
             raise ('Nothing to do. Please check.')          
 
     def load_network_from_edgelist_file(self, edge_file_name):
+        # Load the network from files
         if '.mtx' in edge_file_name or '.mm' in edge_file_name:
             self.load_network_from_scipy_matrix()
         else:
@@ -36,6 +37,7 @@ class NetworkManipulator(object):
             self.graph = nx.read_edgelist(fh, create_using=nx.DiGraph())
 
     def load_network_from_scipy_matrix(self):
+        # Load the network from scipy sparse matrix
         scipy_matrix = mmread(self.matrix_file_name)
         b = scipy_matrix.todense()
         c = np.matrix(b)
@@ -43,6 +45,7 @@ class NetworkManipulator(object):
         self.graph = nx.DiGraph(c)
 
     def assign_authorities_and_hubs(self):
+        # assign default values for hubs and authorities
         for node, data in self.graph.nodes(data=True):
             data['auth'] = 1
             data['hub'] = 1
@@ -79,6 +82,7 @@ class NetworkManipulator(object):
 
     def find_hubs_and_authorities(self):
         self.assign_authorities_and_hubs()
+        ''' Implement HITS Algorithm. '''
         for i in range(int(self.steps)):
             norm = 0 
             for node, data in self.graph.nodes(data=True):
@@ -111,7 +115,8 @@ class NetworkManipulator(object):
                 norm = math.sqrt(norm)
                 for node, data in self.graph.nodes(data=True):
                     data['hub'] = round(data['hub'] / norm, 3)
-        
+
+        ''' Print top n values of hubs and authorities. '''
         self.print_network_with_hubs_and_authorities()
 
 
@@ -133,11 +138,11 @@ if __name__ == "__main__":
     except:
         print_size=20
 
-    nm = NetworkManipulator(
-        # matrix_file_name='delaunay_n14.mtx', 
-        edge_file_name=matrix_file_name,
-        steps=steps,
-        normalize=normalize,
-        print_list_size=print_size
+    # call network manager 
+    nm = NetworkManipulator( 
+        edge_file_name=matrix_file_name, # network file to load
+        steps=steps, # Number of steps to iterate
+        normalize=normalize, # normalize or not
+        print_list_size=print_size # size of list elements to print
     )
     nm.find_hubs_and_authorities()

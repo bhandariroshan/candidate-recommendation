@@ -49,8 +49,8 @@ class NetworkManipulator(object):
 
     def print_network_with_hubs_and_authorities(self):
         network = []
-        auth_network_list = ""
-        hub_network_list = ""
+        auth_network_list = []
+        hub_network_list = []
 
         for each_node, data in self.graph.nodes(data=True):
             data['node'] = each_node
@@ -59,20 +59,11 @@ class NetworkManipulator(object):
         auth_network = sorted(network,  key=lambda k: k['auth'], reverse=True)
         hub_network = sorted(network,  key=lambda k: k['hub'], reverse=True)
 
-        for count, each_node in enumerate(auth_network):
-            if count > self.print_list_size:
-                break
-            auth_network_list += str(each_node['node']) + " "
+        for each_node in auth_network:
+            auth_network_list.append(each_node['node'])
 
-        auth_network_list = auth_network_list[:-1]
-
-        for count, each_node in enumerate(hub_network):
-            if count > self.print_list_size:
-                break
-
-            hub_network_list += str(each_node['node']) + " "
-
-        hub_network_list = hub_network_list[:-1]
+        for each_node in hub_network:
+            hub_network_list.append(each_node['node'])
 
         print(auth_network_list)
         print(hub_network_list)
@@ -121,7 +112,7 @@ if __name__ == "__main__":
     try:
         steps = sys.argv[2]
     except:
-        steps = 10
+        steps = 2
 
     try:
         normalize = int(sys.argv[3])
@@ -131,7 +122,7 @@ if __name__ == "__main__":
     try:
         print_size = int(sys.argv[4])
     except:
-        print_size=20
+        print_size=None
 
     nm = NetworkManipulator(
         # matrix_file_name='delaunay_n14.mtx', 
