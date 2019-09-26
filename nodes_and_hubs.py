@@ -9,8 +9,8 @@ from networkx.convert_matrix import from_scipy_sparse_matrix
 class NetworkManipulator(object):
     def __init__(self, 
         edge_file_name=None, 
-        steps=None,
-        normalize=False
+        steps=3,
+        normalize=True
     ):
         self.steps = steps
         self.graph = nx.DiGraph()
