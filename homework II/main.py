@@ -69,12 +69,8 @@ class NetworkManipulator(object):
 
         hub_network_list = hub_network_list[:-1]
 
-        if self.print_list_size:
-            print(hub_network_list)
-            print(auth_network_list)
-        else:
-            print(auth_network_list)
-            print(hub_network_list)
+        print(auth_network_list)
+        print(hub_network_list)
 
     def find_hubs_and_authorities(self):
         self.assign_authorities_and_hubs()
