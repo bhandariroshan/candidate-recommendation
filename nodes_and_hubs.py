@@ -10,13 +10,15 @@ class NetworkManipulator(object):
     def __init__(self, 
         edge_file_name=None, 
         steps=3,
-        normalize=True
+        normalize=True,
+        print_list_size=None
     ):
         self.steps = steps
         self.graph = nx.DiGraph()
         self.normalize = bool(normalize)
         self.matrix_file_name = matrix_file_name
         self.edge_file_name = edge_file_name
+        self.print_list_size = print_list_size
 
         if self.edge_file_name:
             self.load_network_from_edgelist_file(self.edge_file_name)
@@ -42,14 +44,28 @@ class NetworkManipulator(object):
 
     def print_network_with_hubs_and_authorities(self):
         network = []
+        auth_network_list = []
+        hub_network_list = []
+
         for each_node, data in self.graph.nodes(data=True):
             data['node'] = each_node
             network.append(data)
 
         auth_network = sorted(network,  key=lambda k: k['auth'], reverse=True)
+        hub_network = sorted(network,  key=lambda k: k['hub'], reverse=True)
 
         for each_node in auth_network:
-            print(each_node['node'], each_node['auth'], each_node['hub'])
+            auth_network_list.append(each_node['node'])
+
+        for each_node in hub_network:
+            hub_network_list.append(each_node['node'])
+
+        if self.print_list_size:
+            print(auth_network_list[0:self.print_list_size])
+            print(hub_network_list[0:self.print_list_size])
+        else:
+            print(auth_network_list)
+            print(hub_network_list)
 
     def find_hubs_and_authorities(self):
         self.assign_authorities_and_hubs()
@@ -92,13 +108,26 @@ class NetworkManipulator(object):
 if __name__ == "__main__":  
     # execute only if run as a script
     matrix_file_name = sys.argv[1]
-    steps = sys.argv[2]
-    normalize = int(sys.argv[3])
+    try:
+        steps = sys.argv[2]
+    except:
+        steps = 2
+    
+    try:
+        normalize = int(sys.argv[3])
+    except:
+        normalize = True
+
+    try:
+        print_size = int(sys.argv[4])
+    except:
+        print_size=None
 
     nm = NetworkManipulator(
         # matrix_file_name='delaunay_n14.mtx', 
         edge_file_name=matrix_file_name,
         steps=steps,
-        normalize=normalize
+        normalize=normalize,
+        print_list_size=print_size
     )
     nm.find_hubs_and_authorities()
