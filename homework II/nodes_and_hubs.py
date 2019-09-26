@@ -36,7 +36,6 @@ class NetworkManipulator(object):
             self.graph = nx.read_edgelist(fh, create_using=nx.DiGraph())
 
     def load_network_from_scipy_matrix(self):
-        print(self.matrix_file_name)
         scipy_matrix = mmread(self.matrix_file_name)
         b = scipy_matrix.todense()
         c = np.matrix(b)
