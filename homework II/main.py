@@ -59,12 +59,17 @@ class NetworkManipulator(object):
         auth_network = sorted(network,  key=lambda k: k['auth'], reverse=True)
         hub_network = sorted(network,  key=lambda k: k['hub'], reverse=True)
 
-        for each_node in auth_network:
+        for count, each_node in enumerate(auth_network):
+            if count > self.print_list_size:
+                break
             auth_network_list += str(each_node['node']) + " "
 
         auth_network_list = auth_network_list[:-1]
 
-        for each_node in hub_network:
+        for count, each_node in enumerate(hub_network):
+            if count > self.print_list_size:
+                break
+
             hub_network_list += str(each_node['node']) + " "
 
         hub_network_list = hub_network_list[:-1]
