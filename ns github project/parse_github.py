@@ -16,14 +16,6 @@ processed = []
 request_count = 0
 
 credentials = [
-    ('sidarthjoshi',    '89ac5b4e2e2c205a547859bd366c0549abc4632d'),
-    ('rbhanda1234',     'd81248ef36efe717e630169af927a32114ada11f'),
-    ('bhanduroshan',    '996ba235aebaa2185dc490ea56785db0a7a234e0'),
-    ('eshwarprasad',    'e9b8258423580bd294bbe00cecacb7bf906ea416'),
-    ('rbhanda123',      'ffa18193f0d547979b7ec3bf5cd38c873bb68fcc'),
-    ('krupakmurthy',    'e03edf3417d0aa3bbc5f4916616a937c4ab3d14a'),
-    ('lakshmisagar-as', '4be4505019a0a9ebb9f4f06ccd1dced8ba4e53ce'),
-    ('Manavi-s-m',      'dfd2e1d119479dd15c31b1f8580530b27a5dbdfb')
 ]
 
 start = time.time()
