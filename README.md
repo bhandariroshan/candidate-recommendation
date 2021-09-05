@@ -10,10 +10,22 @@ Software engineering recruiters receive hundreds or even thousands of applicatio
 1. Download the files in from this google drive link: https://drive.google.com/drive/folders/1go2xQTel_xZk9ZQqCgojtnHBzU7vk2Of?usp=sharing
 
 # Step 3 - Run code and Download the data again
+1. Go to Github and generate api tokens for its public api.
+2. Open step1_download_github_public_data.py in any notebook.
+3. Add the username and token generated from github in variable called "credentials" in the file.
+4. Save and Close the file.
+5. Open command line and run - python step1_download_github_public_data.py
 
-# Step 4 - Train the model
+The script will download necessary file and dump the network data as a python pickle file.
+
+# Step 4 - Train machine learning models
+1. Load step2_train_machine_learning_model.py.ipynb in Jupyternotebook.
+2. Run the code line by line (if necessary use already downloaded data).
 
 # Step 5 - Run the Recommendation System
 If you just want to run the recommendation system, you can skip step 3 and step 4, and directly run the step 5, then follow the instructions on step 5.
 
-1. 
+1. Open terminal
+2. Run python main.py
+3. Follow the instructions printed on the terminal.
+4. If necessary download already prepared data from Step 2 and run the code.
